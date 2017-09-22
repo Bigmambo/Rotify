@@ -18,7 +18,7 @@ def play_pause(channel):
     play_pause_json = json.loads(req.get('/v1/me/player'))
     if play_pause_json["is_playing"] == "true":
         req.put('/v1/me/player/play')
-    else
+    else:
         req.put('/v1/me/player/pause')
 
 GPIO.add_event_detect(8, GPIO.RISING, callback=play_pause, bouncetime=200)
