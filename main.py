@@ -12,7 +12,7 @@ scope = "streaming playlist-read-private playlist-read-collaborative user-librar
 token = util.prompt_for_user_token(username,scope,client_id='a7864bbc8098453b903abd5008c5a38e',client_secret='4d7d1c6f760c49b4b858572921f9e649',redirect_uri='http://localhost:8888/callback')
 sp = spotipy.Spotify(auth=token)
 
-encoder = gaugette.rotary_encoder.RotaryEncoder.Worker(A_PIN, B_PIN)
+encoder = gaugette.rotary_encoder.RotaryEncoder.Worker(7, 10)
 encoder.start()
 
 chan_list = [8]
