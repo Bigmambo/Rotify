@@ -25,23 +25,25 @@ Current_A2 = 1
 LockRotary = threading.Lock()
 
 def rotary_interrupt(A_or_B):
-	global delta, Current_A1, Current_A2, LockRotary
-    
+    global delta, Current_A1, Current_A2, LockRotary
+
     Switch_A1 = GPIO.input(Enc_A1)
     Switch_A2 = GPIO.input(Enc_A2)
 
     if Current_A1 == Switch_A1 and Current_A2 == Switch_A2:
         return
+        
     Current_A1 = Switch_A1
     Current_A2 = Switch_A2
+
     if (Switch_A1 and Switch_A2):
-		LockRotary.acquire()
-		if A_or_B == Enc_A2:
-			delta += 1
-		else:
-			delta -= 1
-		LockRotary.release()
-	return
+            LockRotary.acquire()
+        if A_or_B == Enc_A2:
+            delta += 1
+        else:
+            delta -= 1
+        LockRotary.release()
+    return
 
 
 def volume():
