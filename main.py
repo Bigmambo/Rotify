@@ -11,7 +11,6 @@ username = "bigmambo"
 scope = "streaming playlist-read-private playlist-read-collaborative user-library-read user-library-read playlist-modify-private user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-recently-played"
 token = util.prompt_for_user_token(username,scope,client_id='a7864bbc8098453b903abd5008c5a38e',client_secret='4d7d1c6f760c49b4b858572921f9e649',redirect_uri='http://localhost:8888/callback')
 sp = spotipy.Spotify(auth=token)
-
 Button_A = 8
 Enc_A1 = 7
 Enc_A2 = 10
@@ -19,9 +18,6 @@ Enc_A2 = 10
 chan_list = [Button_A, Enc_A1, Enc_A2]
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(chan_list, GPIO.IN)
-GPIO.add_event_detect(Button_A, GPIO.RISING, callback=play_pause, bouncetime=200)
-GPIO.add_event_detect(Enc_A1, GPIO.RISING, callback=rotary_interrupt)
-GPIO.add_event_detect(Enc_A2, GPIO.RISING, callback=rotary_interrupt)
 
 delta = 0
 Current_A1 = 1
@@ -29,11 +25,9 @@ Current_A2 = 1
 LockRotary = threading.Lock()
 
 def rotary_interrupt(A_or_B):
-    global delta, Current_A1, Current_A2, LockRotary
-
+	global delta, Current_A1, Current_A2, LockRotary
     Switch_A1 = GPIO.input(Enc_A1)
     Switch_A2 = GPIO.input(Enc_A2)
-
     if Current_A1 == Switch_A1 and Current_A2 == Switch_A2:
         return
     Current_A1 = Switch_A1
@@ -45,7 +39,7 @@ def rotary_interrupt(A_or_B):
 		else:
 			delta -= 1
 		LockRotary.release()
-    return
+	return
 
 
 def volume():
@@ -74,6 +68,13 @@ def volume_knob():
     delta = 0
 
 def main():
+
+    GPIO.add_event_detect(Button_A, GPIO.RISING, callback=play_pause, bouncetime=200)
+    GPIO.add_event_detect(Enc_A1, GPIO.RISING, callback=rotary_interrupt)
+    GPIO.add_event_detect(Enc_A2, GPIO.RISING, callback=rotary_interrupt)
+
     while True:
         time.sleep(0.1)
         volume = volume_knob()
+
+main()
