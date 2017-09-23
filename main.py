@@ -12,11 +12,15 @@ scope = "streaming playlist-read-private playlist-read-collaborative user-librar
 token = util.prompt_for_user_token(username,scope,client_id='a7864bbc8098453b903abd5008c5a38e',client_secret='4d7d1c6f760c49b4b858572921f9e649',redirect_uri='http://localhost:8888/callback')
 sp = spotipy.Spotify(auth=token)
 
+<<<<<<< HEAD
 Button_A = 8
 Enc_A1 = 7
 Enc_A2 = 10
 
 chan_list = [Button_A, Enc_A1, Enc_A2]
+=======
+chan_list = [8]
+>>>>>>> c5a3a7ab7f03c8c593a4bb70849884c6c043fccd
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(chan_list, GPIO.IN)
 GPIO.add_event_detect(Button_A, GPIO.RISING, callback=play_pause, bouncetime=200)
