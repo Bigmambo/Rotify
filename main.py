@@ -46,18 +46,18 @@ def rotary_interrupt(A_or_B):
 
 
 def volume():
-    v = get('/v1/me/player')
+    v = req.get('/v1/me/player')
     v_json = json.loads(v)
     vol = v_json["volume_percent"]
     return vol
 
 def play_pause(channel):
-    r = get('/v1/me/player')
+    r = req.get('/v1/me/player')
     play_pause_json = json.loads(r)
     if play_pause_json["is_playing"] == "true":
-        put('/v1/me/player/play')
+        req.put('/v1/me/player/play')
     else:
-        put('/v1/me/player/pause')
+        req.put('/v1/me/player/pause')
 
 def volume_knob():
     v = volume()
@@ -67,7 +67,7 @@ def volume_knob():
             vol = 0
         elif vol > 100:
             vol = 100
-    put('/v1/me/player/volume', vol)
+    req.put('/v1/me/player/volume', vol)
     delta = 0
 
 def main():
