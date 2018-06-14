@@ -1,7 +1,7 @@
 import sys
 import spotipy
 import spotipy.util as util
-import Req
+import req
 import RPi.GPIO as GPIO
 import threading
 import json
@@ -12,22 +12,38 @@ scope = "streaming playlist-read-private playlist-read-collaborative user-librar
 token = util.prompt_for_user_token(username,scope,client_id='a7864bbc8098453b903abd5008c5a38e',client_secret='4d7d1c6f760c49b4b858572921f9e649',redirect_uri='http://localhost:8888/callback')
 sp = spotipy.Spotify(auth=token)
 Button_A = 8
+Button_B = 20
+Button_C = 21
 Enc_A1 = 7
 Enc_A2 = 10
+Enc_B1 = 5
+Enc_B2 = 6
+Enc_C1 = 13
+Enc_C2 = 19
 
-chan_list = [Button_A, Enc_A1, Enc_A2]
+chan_list = [Button_A, Button_B, Button_C, Enc_A1, Enc_A2, Enc_B1, Enc_B2, Enc_C1, Enc_C2]
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(chan_list, GPIO.IN)
+GPIO.setup(chan_list, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-delta = 0
+delta1 = 0
+delta2= 0
+delta3 = 0
 Current_A1 = 1
 Current_A2 = 1
+Current_B1 = 1
+Current_B2 = 1
+Current_C1 = 1
+Current_C2 = 1
 Switch_A1 = GPIO.input(Enc_A1)
 Switch_A2 = GPIO.input(Enc_A2)
+Switch_B1 = GPIO.input(Enc_B1)
+Switch_B2 = GPIO.input(Enc_B2)
+Switch_C1 = GPIO.input(Enc_C1)
+Switch_C2 = GPIO.input(Enc_C2)
 LockRotary = threading.Lock()
 
-def rotary_interrupt(A_or_B):
-    global delta, Current_A1, Current_A2, LockRotary
+def rotary_interrupt1(A1_or_A2):
+    global delta1, Current_A1, Current_A2, LockRotary
 
     if Current_A1 == Switch_A1 and Current_A2 == Switch_A2:
         return
@@ -37,13 +53,48 @@ def rotary_interrupt(A_or_B):
 
     if (Switch_A1 and Switch_A2):
         LockRotary.acquire()
-        if A_or_B == Enc_A2:
-            delta += 1
+        if A1_or_A2 == Enc_A2:
+            delta1 += 1
         else:
-            delta -= 1
+            delta1 -= 1
         LockRotary.release()
     return
 
+def rotary_interrupt2(B1_or_B2):
+    global delta2, Current_B1, Current_B2, LockRotary
+
+    if Current_B1 == Switch_B1 and Current_B2 == Switch_B2:
+        return
+
+    Current_B1 = Switch_B1
+    Current_B2 = Switch_B2
+
+    if (Switch_B1 and Switch_B2):
+        LockRotary.acquire()
+        if B1_or_B2 == Enc_B2:
+            delta2 += 1
+        else:
+            delta2 -= 1
+        LockRotary.release()
+    return
+
+def rotary_interrupt3(C1_or_C2):
+    global delta3, Current_C1, Current_C2, LockRotary
+
+    if Current_C1 == Switch_C1 and Current_C2 == Switch_C2:
+        return
+
+    Current_C1 = Switch_C1
+    Current_C2 = Switch_C2
+
+    if (Switch_C1 and Switch_C2):
+        LockRotary.acquire()
+        if C1_or_C2 == Enc_C2:
+            delta3 += 1
+        else:
+            delta3 -= 1
+        LockRotary.release()
+    return
 
 def volume():
     v = req.get('/v1/me/player')
@@ -61,23 +112,36 @@ def play_pause(channel):
 
 def volume_knob():
     v = volume()
-    if delta!=0:
-        vol = (5 * (v/5)) + (delta * 5)
-        if vol < 0:
-            vol = 0
-        elif vol > 100:
-            vol = 100
+    vol = (5 * (v/5)) + (delta1 * 5)
+    if vol < 0:
+        vol = 0
+    elif vol > 100:
+        vol = 100
     req.put('/v1/me/player/volume', vol)
-    delta = 0
+    delta1 = 0
+
+def next_track():
+    req.post('/v1/me/player/next')
+
+def previous_track():
+    req.post('/v1/me/player/previous')
 
 def main():
 
     GPIO.add_event_detect(Button_A, GPIO.RISING, callback=play_pause, bouncetime=200)
-    GPIO.add_event_detect(Enc_A1, GPIO.RISING, callback=rotary_interrupt)
-    GPIO.add_event_detect(Enc_A2, GPIO.RISING, callback=rotary_interrupt)
+    GPIO.add_event_detect(Button_B, GPIO.RISING, callback=next_track, bouncetime=200)
+    GPIO.add_event_detect(Button_C, GPIO.RISING, callback=previous_track, bouncetime=200)
+    GPIO.add_event_detect(Enc_A1, GPIO.RISING, callback=rotary_interrupt1)
+    GPIO.add_event_detect(Enc_A2, GPIO.RISING, callback=rotary_interrupt1)
+    GPIO.add_event_detect(Enc_B1, GPIO.RISING, callback=rotary_interrupt2)
+    GPIO.add_event_detect(Enc_B2, GPIO.RISING, callback=rotary_interrupt2)
+    GPIO.add_event_detect(Enc_C1, GPIO.RISING, callback=rotary_interrupt3)
+    GPIO.add_event_detect(Enc_C2, GPIO.RISING, callback=rotary_interrupt3)
 
     while True:
         time.sleep(0.1)
-        volume = volume_knob()
+        if delta1 != 0:
+            volume_knob()
+
 
 main()
