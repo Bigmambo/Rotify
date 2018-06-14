@@ -129,10 +129,10 @@ def volume_knob():
     req.put('/v1/me/player/volume', vol)
     delta1 = 0
 
-def next_track():
+def next_track(channel):
     req.post('/v1/me/player/next')
 
-def previous_track():
+def previous_track(channel):
     req.post('/v1/me/player/previous')
 
 def main():
