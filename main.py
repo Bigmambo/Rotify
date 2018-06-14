@@ -113,7 +113,7 @@ def volume():
 
 def play_pause(channel):
     r = req.get('/v1/me/player')
-    play_pause_json = json.loads(r)
+    play_pause_json = json.dumps(result , indent=4)
     if play_pause_json["is_playing"] == "true":
         req.put('/v1/me/player/play')
     else:
