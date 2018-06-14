@@ -22,7 +22,7 @@ Enc_C1 = 13
 Enc_C2 = 19
 
 chan_list = [Button_A, Button_B, Button_C, Enc_A1, Enc_A2, Enc_B1, Enc_B2, Enc_C1, Enc_C2]
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(Button_A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(Button_B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
