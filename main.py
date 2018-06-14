@@ -11,11 +11,11 @@ username = "bigmambo"
 scope = "streaming playlist-read-private playlist-read-collaborative user-library-read user-library-read playlist-modify-private user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-recently-played"
 token = util.prompt_for_user_token(username,scope,client_id='a7864bbc8098453b903abd5008c5a38e',client_secret='4d7d1c6f760c49b4b858572921f9e649',redirect_uri='http://localhost:8888/callback')
 sp = spotipy.Spotify(auth=token)
-Button_A = 8
+Button_A = 23
 Button_B = 20
 Button_C = 21
-Enc_A1 = 7
-Enc_A2 = 10
+Enc_A1 = 24
+Enc_A2 = 22
 Enc_B1 = 5
 Enc_B2 = 6
 Enc_C1 = 13
