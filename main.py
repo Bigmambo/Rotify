@@ -118,7 +118,7 @@ def play_pause(channel):
     if play_pause_json["is_playing"] == "true":
         req.put('/v1/me/player/play')
     else:
-        req.put('/v1/me/player/pause')
+        req.put('/v1/me/player/pause', )
 
 def volume_knob():
     v = volume()
