@@ -54,9 +54,6 @@ LockRotary = threading.Lock()
 
 def rotary_interrupt1(A1_or_A2):
     global delta1, Current_A1, Current_A2, LockRotary
-    
-    Switch_A1 = GPIO.input(Enc_A1)
-    Switch_A2 = GPIO.input(Enc_A2)
 
     if Current_A1 == Switch_A1 and Current_A2 == Switch_A2:
         return
@@ -68,12 +65,9 @@ def rotary_interrupt1(A1_or_A2):
         LockRotary.acquire()
         if A1_or_A2 == Enc_A2:
             delta1 += 1
-            print("+1")
         else:
             delta1 -= 1
-            print("-1")
         LockRotary.release()
-        print(delta1)
     return
 
 def rotary_interrupt2(B1_or_B2):
@@ -114,33 +108,31 @@ def rotary_interrupt3(C1_or_C2):
 
 def volume():
     v = req.get('/v1/me/player')
-    v_json = v.json()
-    vol_device = v_json["device"]
-    vol = vol_device["volume_percent"]
-    print(vol)
+    v_json = json.loads(v)
+    vol = v_json["volume_percent"]
     return vol
 
 def play_pause(channel):
     r = req.get('/v1/me/player')
-    play_pause_json = json.loads(r.text)
-    if play_pause_json["is_playing"] == False:
+    
+play_pause_json = json.loads(r.text)
+    if play_pause_json["is_playing"] == True:
         print("play")
         req.put('/v1/me/player/play', '')
     else:
         print("pause")
         req.put('/v1/me/player/pause', '')
 
-def volume_knob(delta):
-    print("debug1")
+def volume_knob():
     v = volume()
-    vol = (5 * (v/5)) + (delta * 5)
+    vol = (5 * (v/5)) + (delta1 * 5)
     if vol < 0:
         vol = 0
     elif vol > 100:
         vol = 100
-    vol = str(vol)
     req.put('/v1/me/player/volume', vol)
-    return
+    delta1 = 0
+    print("enc1")
 
 def next_track(channel):
     req.post('/v1/me/player/next')
@@ -149,7 +141,7 @@ def previous_track(channel):
     req.post('/v1/me/player/previous')
 
 def main():
-   
+
     GPIO.add_event_detect(Button_A, GPIO.RISING, callback=play_pause, bouncetime=200)
     GPIO.add_event_detect(Button_B, GPIO.RISING, callback=next_track, bouncetime=200)
     GPIO.add_event_detect(Button_C, GPIO.RISING, callback=previous_track, bouncetime=200)
@@ -160,14 +152,11 @@ def main():
     GPIO.add_event_detect(Enc_C1, GPIO.RISING, callback=rotary_interrupt3)
     GPIO.add_event_detect(Enc_C2, GPIO.RISING, callback=rotary_interrupt3)
 
-    delta1 = 0
-
     while True:
         time.sleep(0.1)
         if delta1 != 0:
-            print("debug2")
-            volume_knob(delta1)
-            delta1 = 0
+            volume_knob()
+            print(delta1)
 
 
 main()
